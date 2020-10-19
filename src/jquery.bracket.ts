@@ -1506,7 +1506,8 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           opts.onMatchClick(userData);
         });
       }
-
+      console.log(`@@@@@ match.a.source().name >>>>>>>> ${match.a.source().name}`, match.a.source().name)
+      console.log(`@@@@@ match.b.source().name >>>>>>>> ${match.b.source().name}`, match.b.source().name);
       match.a.name = match.a.source().name;
       match.b.name = match.b.source().name;
 
