@@ -1,6 +1,6 @@
 {
   "name": "jquery-bracket",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "homepage": "https://github.com/teijo/jquery-bracket",
   "authors": ["Teijo Laine"],
   "description": "Library for organizing single and double elimination tournaments",
