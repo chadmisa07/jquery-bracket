@@ -28,7 +28,7 @@ interface BracketDecorator<TTeam, TScore> {
   ) => void;
   render: (
     container: JQuery,
-    team: TTeam | null,
+    team: TTeam | null | string,
     score: TScore | null,
     entryState: EntryState
   ) => void;
@@ -1339,7 +1339,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
     opts.decorator.render(
       nEl,
-      team.name.toNull(),
+      'test',
       team.score.toNull(),
       teamState(team, opponent, team.score)
     );
