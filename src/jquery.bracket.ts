@@ -28,7 +28,7 @@ interface BracketDecorator<TTeam, TScore> {
   ) => void;
   render: (
     container: JQuery,
-    team: TTeam | null | string,
+    team: TTeam | null,
     score: TScore | null,
     entryState: EntryState
   ) => void;
@@ -1339,7 +1339,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
     opts.decorator.render(
       nEl,
-      'test',
+      team.name.toNull(),
       team.score.toNull(),
       teamState(team, opponent, team.score)
     );
@@ -1506,8 +1506,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           opts.onMatchClick(userData);
         });
       }
-      console.log(`@@@@@ match.a.source().name >>>>>>>> ${match.a.source().name}`, match.a.source().name)
-      console.log(`@@@@@ match.b.source().name >>>>>>>> ${match.b.source().name}`, match.b.source().name);
+
       match.a.name = match.a.source().name;
       match.b.name = match.b.source().name;
 
@@ -1602,9 +1601,9 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           }
         });
 
-      // this.teamCon.append(
-      //   createConnector(this.opts.roundMargin, result, align)
-      // );
+      this.teamCon.append(
+        createConnector(this.opts.roundMargin, result, align)
+      );
     }
     public winner() {
       return this.match.winner();
@@ -1729,8 +1728,6 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     opts: Options<TTeam, TScore, TMData, TUData>
   ) => {
     const resultId = new ResultId();
-
-    console.log('@@@@@@@@@ naka sulod sa JqueryBracket');
 
     const data = opts.init;
 
@@ -2200,10 +2197,10 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       extension
     );
 
-    console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
     const bracket = JqueryBracket(internalOpts);
     $(ctx).data("bracket", { target: ctx, obj: bracket });
-    return bracket;
+    return null;
+    // return bracket;
   }
 
   function isInit<TTeam, TScore, TMData, TUData>(
@@ -2213,7 +2210,6 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   }
 
   $.fn.bracket = function (method: any) {
-    console.log("@@@@@@@@ ANOTHER CONSOLE LOG >>>>>>>>>>>>>");
     if (typeof method === "string" && method === "data") {
       const bracket = $(this).data("bracket");
       return bracket.obj.data();
