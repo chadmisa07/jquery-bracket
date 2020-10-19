@@ -2210,6 +2210,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   }
 
   $.fn.bracket = function (method: any) {
+    console.log("@@@@@@@@ ANOTHER CONSOLE LOG >>>>>>>>>>>>>");
     if (typeof method === "string" && method === "data") {
       const bracket = $(this).data("bracket");
       return bracket.obj.data();
