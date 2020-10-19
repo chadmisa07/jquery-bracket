@@ -1729,6 +1729,8 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   ) => {
     const resultId = new ResultId();
 
+    console.log('@@@@@@@@@ naka sulod sa JqueryBracket');
+
     const data = opts.init;
 
     const isSingleElimination = data.results.length <= 1;
@@ -2197,7 +2199,6 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       extension
     );
 
-    console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
     console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
     const bracket = JqueryBracket(internalOpts);
     $(ctx).data("bracket", { target: ctx, obj: bracket });
