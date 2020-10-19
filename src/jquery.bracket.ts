@@ -15,7 +15,7 @@ enum EntryState {
   EMPTY_TBD = "empty-tbd",
   ENTRY_NO_SCORE = "entry-no-score",
   ENTRY_DEFAULT_WIN = "entry-default-win",
-  ENTRY_COMPLETE = "entry-complete"
+  ENTRY_COMPLETE = "entry-complete",
 }
 
 type BracketDoneCallback<TTeam> = (val: TTeam, next?: boolean) => void;
@@ -63,7 +63,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   centerConnectors?: boolean;
 }
 
-($ => {
+(($) => {
   class Option<A> {
     public static of<A>(value: A | null): Option<A> {
       return new Option(value);
@@ -157,7 +157,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   enum BranchType {
     TBD,
     BYE,
-    END
+    END,
   }
 
   class Order {
@@ -191,7 +191,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     }
 
     constructor(
-      readonly source: (() => TeamBlock<TTeam, TScore>), // Where base of the information propagated from
+      readonly source: () => TeamBlock<TTeam, TScore>, // Where base of the information propagated from
       private nameOrGetter: Option<TTeam> | NameGetter<TTeam>,
       readonly order: Option<Order>,
       public seed: Option<number>,
@@ -227,9 +227,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           } else if (sourceType === BranchType.END) {
             return BranchType.BYE;
           }
-          const sourceSiblingType = this.source()
-            .sibling()
-            .emptyBranch();
+          const sourceSiblingType = this.source().sibling().emptyBranch();
           if (sourceSiblingType === BranchType.TBD) {
             return BranchType.TBD;
           }
@@ -400,27 +398,21 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
     return {
       highlight() {
-        elements.each(function() {
+        elements.each(function () {
           $(this).addClass(addedClass);
 
           if ($(this).hasClass("win")) {
-            $(this)
-              .parent()
-              .find(".connector")
-              .addClass(addedClass);
+            $(this).parent().find(".connector").addClass(addedClass);
           }
         });
       },
 
       deHighlight() {
-        elements.each(function() {
+        elements.each(function () {
           $(this).removeClass(addedClass);
-          $(this)
-            .parent()
-            .find(".connector")
-            .removeClass(addedClass);
+          $(this).parent().find(".connector").removeClass(addedClass);
         });
-      }
+      },
     };
   }
 
@@ -450,7 +442,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       }
     }
 
-    container.find(".team").mouseover(function() {
+    container.find(".team").mouseover(function () {
       const teamId = $(this).attr("data-teamid");
       // Don't highlight BYEs
       if (teamId === undefined) {
@@ -458,7 +450,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       }
       const track = trackHighlighter(parseInt(teamId, 10), null, container);
       track.highlight();
-      $(this).mouseout(function() {
+      $(this).mouseout(function () {
         track.deHighlight();
         $(this).unbind("mouseout");
       });
@@ -477,7 +469,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     input.blur(() => {
       done(input.val());
     });
-    input.keydown(e => {
+    input.keydown((e) => {
       const key = e.keyCode || e.which;
       if (key === 9 /*tab*/ || key === 13 /*return*/ || key === 27 /*esc*/) {
         e.preventDefault();
@@ -557,11 +549,11 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
     return [
       {
-        source: () => teamA
+        source: () => teamA,
       },
       {
-        source: () => teamB
-      }
+        source: () => teamB,
+      },
     ];
   };
 
@@ -577,7 +569,9 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     tC.css({
       bottom: skipConsolationRound ? "" : -height / 2 + "px",
       position: "absolute",
-      top: skipConsolationRound ? match.el.height() / 2 - height / 2 + "px" : ""
+      top: skipConsolationRound
+        ? match.el.height() / 2 - height / 2 + "px"
+        : "",
     });
   };
 
@@ -617,12 +611,9 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       winners.final().setConnectorCb(Option.empty());
 
       if (teams.length > 1 && !opts.skipConsolationRound) {
-        const prev = winners
-          .final()
-          .getRound()
-          .prev();
-        const third = prev.map(p => () => p.match(0).loser()).toNull();
-        const fourth = prev.map(p => () => p.match(1).loser()).toNull();
+        const prev = winners.final().getRound().prev();
+        const third = prev.map((p) => () => p.match(0).loser()).toNull();
+        const fourth = prev.map((p) => () => p.match(1).loser()).toNull();
         const consol = round.addMatch(
           () => [{ source: third }, { source: fourth }],
           Option.of(consolationBubbles)
@@ -657,15 +648,15 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
             winners
               .round(0)
               .match(m * 2)
-              .loser()
+              .loser(),
         },
         {
           source: () =>
             winners
               .round(0)
               .match(m * 2 + 1)
-              .loser()
-        }
+              .loser(),
+        },
       ];
     } else {
       /* match with dropped */
@@ -679,15 +670,15 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
             losers
               .round(r * 2)
               .match(m)
-              .winner()
+              .winner(),
         },
         {
           source: () =>
             winners
               .round(r + 1)
               .match(winnerMatch)
-              .loser()
-        }
+              .loser(),
+        },
       ];
     }
   };
@@ -708,14 +699,14 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     const center = { height: 0, shift: connectorOffset * 2 };
     return match
       .winner()
-      .order.map(order =>
+      .order.map((order) =>
         order.map(
           centerConnectors ? center : { height: 0, shift: connectorOffset },
           centerConnectors
             ? center
             : {
                 height: -connectorOffset * 2,
-                shift: connectorOffset
+                shift: connectorOffset,
               }
         )
       )
@@ -784,16 +775,16 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     const finalMatch = round.addMatch(
       () => [
         { source: () => winners.winner() },
-        { source: () => losers.winner() }
+        { source: () => losers.winner() },
       ],
-      Option.of(match => {
+      Option.of((match) => {
         /* Track if container has been resized for final rematch */
         let isResized = false;
         /* LB winner won first final match, need a new one */
         if (
           !opts.skipSecondaryFinal &&
-          (!match.winner().name.isEmpty() &&
-            match.winner().name === losers.winner().name)
+          !match.winner().name.isEmpty() &&
+          match.winner().name === losers.winner().name
         ) {
           if (finals.size() === 2) {
             return false;
@@ -823,17 +814,17 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           const match2 = finalRound.addMatch(
             () => [
               { source: () => match.first() },
-              { source: () => match.second() }
+              { source: () => match.second() },
             ],
             Option.of(winnerBubbles)
           );
 
           match.setConnectorCb(
-            Option.of(tC => ({ height: 0, shift: tC.height() / 2 }))
+            Option.of((tC) => ({ height: 0, shift: tC.height() / 2 }))
           );
 
           match2.setConnectorCb(Option.empty());
-          match2.setAlignCb(tC => {
+          match2.setAlignCb((tC) => {
             const height = winners.el.height() + losers.el.height();
             match2.el.css({ height });
 
@@ -857,7 +848,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       })
     );
 
-    finalMatch.setAlignCb(tC => {
+    finalMatch.setAlignCb((tC) => {
       const height: number =
         (winners.el.height() + losers.el.height()) /
         (opts.skipConsolationRound ? 1 : 2);
@@ -873,24 +864,17 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     });
 
     if (!opts.skipConsolationRound) {
-      const prev = losers
-        .final()
-        .getRound()
-        .prev();
+      const prev = losers.final().getRound().prev();
       const consol = round.addMatch(
         () => [
           {
-            source: () =>
-              prev
-                .get()
-                .match(0)
-                .loser()
+            source: () => prev.get().match(0).loser(),
           },
-          { source: () => losers.loser() }
+          { source: () => losers.loser() },
         ],
         Option.of(consolationBubbles)
       );
-      consol.setAlignCb(tC => {
+      consol.setAlignCb((tC) => {
         const height = (winners.el.height() + losers.el.height()) / 2;
         consol.el.css({ height });
 
@@ -909,7 +893,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     }
 
     winners.final().setConnectorCb(
-      Option.of(tC => {
+      Option.of((tC) => {
         const connectorOffset = tC.height() / 4;
         const topShift =
           (winners.el.height() / 2 +
@@ -921,24 +905,24 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
         const { height, shift } = winners
           .winner()
-          .order.map(order =>
+          .order.map((order) =>
             order.map(
               {
                 height: matchupOffset + connectorOffset * 2,
-                shift: connectorOffset * (opts.centerConnectors ? 2 : 1)
+                shift: connectorOffset * (opts.centerConnectors ? 2 : 1),
               },
               {
                 height:
                   matchupOffset +
                   connectorOffset * (opts.centerConnectors ? 2 : 0),
-                shift: connectorOffset * (opts.centerConnectors ? 2 : 3)
+                shift: connectorOffset * (opts.centerConnectors ? 2 : 3),
               }
             )
           )
           .orElse({
             height:
               matchupOffset + connectorOffset * (opts.centerConnectors ? 2 : 1),
-            shift: connectorOffset * 2
+            shift: connectorOffset * 2,
           });
 
         return { height: height - tC.height() / 2, shift };
@@ -946,7 +930,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     );
 
     losers.final().setConnectorCb(
-      Option.of(tC => {
+      Option.of((tC) => {
         const connectorOffset = tC.height() / 4;
         const topShift =
           (winners.el.height() / 2 +
@@ -958,24 +942,24 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
         const { height, shift } = losers
           .winner()
-          .order.map(order =>
+          .order.map((order) =>
             order.map(
               {
                 height:
                   matchupOffset +
                   connectorOffset * (opts.centerConnectors ? 2 : 0),
-                shift: connectorOffset * (opts.centerConnectors ? 2 : 3)
+                shift: connectorOffset * (opts.centerConnectors ? 2 : 3),
               },
               {
                 height: matchupOffset + connectorOffset * 2,
-                shift: connectorOffset * (opts.centerConnectors ? 2 : 1)
+                shift: connectorOffset * (opts.centerConnectors ? 2 : 1),
               }
             )
           )
           .orElse({
             height:
               matchupOffset + connectorOffset * (opts.centerConnectors ? 2 : 1),
-            shift: connectorOffset * 2
+            shift: connectorOffset * 2,
           });
 
         return { height: -(height + tC.height() / 2), shift: -shift };
@@ -992,11 +976,10 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       .map(() =>
         score
           .map<EntryState>(() => EntryState.ENTRY_COMPLETE)
-          .orElseGet(
-            () =>
-              opponent.emptyBranch() === BranchType.BYE
-                ? EntryState.ENTRY_DEFAULT_WIN
-                : EntryState.ENTRY_NO_SCORE
+          .orElseGet(() =>
+            opponent.emptyBranch() === BranchType.BYE
+              ? EntryState.ENTRY_DEFAULT_WIN
+              : EntryState.ENTRY_NO_SCORE
           )
       )
       .orElseGet(() => {
@@ -1015,9 +998,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
   class Round<TTeam, TScore, TMData, TUData> {
     private containerWidth = this.opts.teamWidth + this.opts.scoreWidth;
     private roundCon: JQuery = $(
-      `<div class="round" style="width: ${
-        this.containerWidth
-      }px; margin-right: ${this.opts.roundMargin}px"/>`
+      `<div class="round" style="width: ${this.containerWidth}px; margin-right: ${this.opts.roundMargin}px"/>`
     );
     private matches: Array<Match<TTeam, TScore, TMData, TUData>> = [];
 
@@ -1052,15 +1033,15 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
                   this.bracket
                     .round(this.roundNumber - 1)
                     .match(matchIdx * 2)
-                    .winner()
+                    .winner(),
               },
               {
                 source: () =>
                   this.bracket
                     .round(this.roundNumber - 1)
                     .match(matchIdx * 2 + 1)
-                    .winner()
-              }
+                    .winner(),
+              },
             ];
       const teamA = () => teams[0].source();
       const teamB = () => teams[1].source();
@@ -1091,7 +1072,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         this,
         matchResult,
         matchIdx,
-        this.roundResults.map(r => {
+        this.roundResults.map((r) => {
           return r[matchIdx] === undefined ? null : r[matchIdx];
         }),
         renderCb,
@@ -1116,7 +1097,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         return;
       }
       this.roundCon.appendTo(this.bracket.el);
-      this.matches.forEach(m => m.render());
+      this.matches.forEach((m) => m.render());
     }
     public results(): Array<ResultObject<TScore, TMData>> {
       return this.matches.reduce(
@@ -1152,15 +1133,14 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       // Rounds may be undefined if init score array does not match number of teams
       const roundResults = this.initResults.map<
         Array<ResultObject<TScore, TMData>>
-      >(
-        r =>
-          r[id] === undefined
-            ? new ResultObject(
-                Option.empty<TScore>(),
-                Option.empty<TScore>(),
-                undefined
-              )
-            : r[id]
+      >((r) =>
+        r[id] === undefined
+          ? new ResultObject(
+              Option.empty<TScore>(),
+              Option.empty<TScore>(),
+              undefined
+            )
+          : r[id]
       );
 
       const round = new Round(
@@ -1212,7 +1192,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     }
   }
 
-  const calculateHeight = height => {
+  const calculateHeight = (height) => {
     // drop:
     // [team]'\
     //         \_[team]
@@ -1250,14 +1230,14 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       bottom: !doShift ? -shift - 1 : "",
       height,
       top: doShift ? shift - 1 : "",
-      width
+      width,
     });
 
     const dst = $('<div class="connector"></div>').css({
       [align]: -width,
       bottom: drop ? 0 : "",
       top: !drop ? 0 : "",
-      width
+      width,
     });
 
     return src.append(dst);
@@ -1278,8 +1258,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       // Loser bracket winner has won first match in grand finals,
       // this requires a new match unless explicitely skipped
       const hasGrandFinalRematch =
-        !skipSecondaryFinal &&
-        (results.length === 3 && results[2].length === 2);
+        !skipSecondaryFinal && results.length === 3 && results[2].length === 2;
       return (
         (Math.log(teamCount * 2) / Math.log(2) - 1) * 2 +
         1 +
@@ -1290,15 +1269,15 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
 
   function exportData<TScore, TMData>(data) {
     const output = $.extend(true, {}, data);
-    output.teams = output.teams.map(ts => ts.map(t => t.toNull()));
-    output.results = output.results.map(brackets =>
-      brackets.map(rounds =>
+    output.teams = output.teams.map((ts) => ts.map((t) => t.toNull()));
+    output.results = output.results.map((brackets) =>
+      brackets.map((rounds) =>
         rounds.map((matches: ResultObject<TScore, TMData>) => {
           if (matches.matchData !== undefined) {
             return [
               matches.first.toNull(),
               matches.second.toNull(),
-              matches.matchData
+              matches.matchData,
             ];
           } else {
             return [matches.first.toNull(), matches.second.toNull()];
@@ -1339,9 +1318,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         ? ""
         : `data-resultid="result-${resultId.getNext()}"`;
     const sEl = $(
-      `<div class="score" style="width: ${
-        opts.scoreWidth
-      }px;" ${resultIdAttribute}></div>`
+      `<div class="score" style="width: ${opts.scoreWidth}px;" ${resultIdAttribute}></div>`
     );
     const score =
       team.name.isEmpty() || opponent.name.isEmpty() || !isReady
@@ -1352,8 +1329,9 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     sEl.text(scoreString);
 
     const tEl = $(
-      `<div class="team" style="width: ${opts.teamWidth +
-        opts.scoreWidth}px;"></div>`
+      `<div class="team" style="width: ${
+        opts.teamWidth + opts.scoreWidth
+      }px;"></div>`
     );
     const nEl = $(
       `<div class="label" style="width: ${opts.teamWidth}px;"></div>`
@@ -1366,7 +1344,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       teamState(team, opponent, team.score)
     );
 
-    team.seed.forEach(seed => {
+    team.seed.forEach((seed) => {
       tEl.attr("data-teamid", seed);
     });
 
@@ -1388,7 +1366,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     ) {
       if (!opts.disableTeamEdit) {
         nEl.addClass("editable");
-        nEl.click(function() {
+        nEl.click(function () {
           const span = $(this);
 
           function editor() {
@@ -1421,7 +1399,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         const rId = resultId.get();
 
         sEl.addClass("editable");
-        sEl.click(function() {
+        sEl.click(function () {
           const span = $(this);
 
           function editor() {
@@ -1434,7 +1412,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
             span.empty().append(input);
 
             input.focus().select();
-            input.keydown(function(e) {
+            input.keydown(function (e) {
               if (!isNumber($(this).val())) {
                 $(this).addClass("error");
               } else {
@@ -1532,8 +1510,8 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       match.a.name = match.a.source().name;
       match.b.name = match.b.source().name;
 
-      match.a.score = results.map(r => r.first.toNull());
-      match.b.score = results.map(r => r.second.toNull());
+      match.a.score = results.map((r) => r.first.toNull());
+      match.b.score = results.map((r) => r.second.toNull());
 
       /* match has score even though teams haven't yet been decided */
       /* todo: would be nice to have in preload check, maybe too much work */
@@ -1568,24 +1546,24 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       const connectorOffset = this.teamCon.height() / 4;
       const matchupOffset = this.matchCon.height() / 2;
       const result = cb
-        .map(connectorCb => connectorCb(this.teamCon, this))
+        .map((connectorCb) => connectorCb(this.teamCon, this))
         .orElseGet(() => {
           if (this.seed % 2 === 0) {
             // dir == down
             return this.winner()
-              .order.map(order =>
+              .order.map((order) =>
                 order.map(
                   {
                     height: matchupOffset,
                     shift:
-                      connectorOffset * (this.opts.centerConnectors ? 2 : 1)
+                      connectorOffset * (this.opts.centerConnectors ? 2 : 1),
                   },
                   {
                     height:
                       matchupOffset -
                       connectorOffset * (this.opts.centerConnectors ? 0 : 2),
                     shift:
-                      connectorOffset * (this.opts.centerConnectors ? 2 : 3)
+                      connectorOffset * (this.opts.centerConnectors ? 2 : 3),
                   }
                 )
               )
@@ -1593,24 +1571,24 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
                 height:
                   matchupOffset -
                   connectorOffset * (this.opts.centerConnectors ? 0 : 1),
-                shift: connectorOffset * 2
+                shift: connectorOffset * 2,
               });
           } else {
             // dir == up
             return this.winner()
-              .order.map(order =>
+              .order.map((order) =>
                 order.map(
                   {
                     height:
                       -matchupOffset +
                       connectorOffset * (this.opts.centerConnectors ? 0 : 2),
                     shift:
-                      -connectorOffset * (this.opts.centerConnectors ? 2 : 3)
+                      -connectorOffset * (this.opts.centerConnectors ? 2 : 3),
                   },
                   {
                     height: -matchupOffset,
                     shift:
-                      -connectorOffset * (this.opts.centerConnectors ? 2 : 1)
+                      -connectorOffset * (this.opts.centerConnectors ? 2 : 1),
                   }
                 )
               )
@@ -1618,7 +1596,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
                 height:
                   -matchupOffset +
                   connectorOffset * (this.opts.centerConnectors ? 0 : 1),
-                shift: -connectorOffset * 2
+                shift: -connectorOffset * 2,
               });
           }
         });
@@ -1709,7 +1687,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         this.alignCb(this.teamCon);
       }
 
-      const isLast = this.renderCb.map(cb => cb(this)).orElse(false);
+      const isLast = this.renderCb.map((cb) => cb(this)).orElse(false);
       if (!isLast) {
         this.connect(this.connectorCb);
       }
@@ -1728,13 +1706,13 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     }
   }
 
-  const undefinedToNull = value => (value === undefined ? null : value);
+  const undefinedToNull = (value) => (value === undefined ? null : value);
 
   const wrapResults = <TScore, TMData>(
     initResults
   ): Array<BracketResult<TScore, TMData>> =>
-    initResults.map(brackets =>
-      brackets.map(rounds =>
+    initResults.map((brackets) =>
+      brackets.map((rounds) =>
         rounds.map(
           (matches: [TScore, TScore, TMData]) =>
             new ResultObject(
@@ -1784,7 +1762,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           ? roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
             10
           : roundCount * (opts.teamWidth + opts.scoreWidth + opts.roundMargin) +
-            40
+            40,
       });
     }
 
@@ -1932,7 +1910,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     return {
       data(): InitData<TTeam, TScore, TMData> {
         return exportData(opts.init);
-      }
+      },
     };
   };
 
@@ -2033,7 +2011,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     return value;
   };
 
-  const isPow2 = x => x & (x - 1);
+  const isPow2 = (x) => x & (x - 1);
 
   function assertOptions<TTeam, TScore, TMData, TUData>(
     opts: Options<TTeam, TScore, TMData, TUData>
@@ -2100,7 +2078,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       teamWidth: !input.hasOwnProperty("teamWidth")
         ? 70
         : getPositiveOrZero(input.teamWidth),
-      userData: input.userData
+      userData: input.userData,
     };
 
     assertOptions(opts);
@@ -2138,7 +2116,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       ? rawInit
       : {
           results: [],
-          teams: [[null, null]]
+          teams: [[null, null]],
         };
     if (value.teams === undefined) {
       throw new Error("Teams missing");
@@ -2149,9 +2127,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     const log2Result = isPow2(value.teams.length);
     if (log2Result !== Math.floor(log2Result)) {
       $.error(
-        `"teams" property must have 2^n number of team pairs, i.e. 1, 2, 4, etc. Got ${
-          value.teams.length
-        } team pairs.`
+        `"teams" property must have 2^n number of team pairs, i.e. 1, 2, 4, etc. Got ${value.teams.length} team pairs.`
       );
     }
 
@@ -2165,11 +2141,11 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
         !value.teams || value.teams.length === 0
           ? [[Option.empty<TTeam>(), Option.empty<TTeam>()]]
           : value.teams.map(
-              ts =>
-                ts.map(
-                  t => (t === null ? Option.empty<TTeam>() : Option.of(t))
+              (ts) =>
+                ts.map((t) =>
+                  t === null ? Option.empty<TTeam>() : Option.of(t)
                 ) as [Option<TTeam>, Option<TTeam>]
-            )
+            ),
     };
   }
 
@@ -2220,6 +2196,8 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
       ctx,
       extension
     );
+
+    console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
     const bracket = JqueryBracket(internalOpts);
     $(ctx).data("bracket", { target: ctx, obj: bracket });
     return bracket;
@@ -2231,7 +2209,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     return typeof arg === "object" || arg === undefined;
   }
 
-  $.fn.bracket = function(method: any) {
+  $.fn.bracket = function (method: any) {
     if (typeof method === "string" && method === "data") {
       const bracket = $(this).data("bracket");
       return bracket.obj.data();
@@ -2244,12 +2222,12 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           ...options,
           decorator: options.decorator
             ? options.decorator
-            : { edit: defaultEdit, render: defaultRender }
+            : { edit: defaultEdit, render: defaultRender },
         },
         {
           evaluateScore: defaultEvaluateScore,
           scoreToString: (score: number | null) =>
-            score === null ? "--" : score.toString()
+            score === null ? "--" : score.toString(),
         }
       );
     } else {
