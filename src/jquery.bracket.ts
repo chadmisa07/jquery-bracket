@@ -2198,6 +2198,7 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
     );
 
     console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
+    console.log("@@@@@@@@ internalOpts >>>>>>>>>>>>>", internalOpts);
     const bracket = JqueryBracket(internalOpts);
     $(ctx).data("bracket", { target: ctx, obj: bracket });
     return bracket;
