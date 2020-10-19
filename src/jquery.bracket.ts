@@ -1602,9 +1602,9 @@ interface BracketOptions<TTeam, TScore, TMData, TUData> {
           }
         });
 
-      this.teamCon.append(
-        createConnector(this.opts.roundMargin, result, align)
-      );
+      // this.teamCon.append(
+      //   createConnector(this.opts.roundMargin, result, align)
+      // );
     }
     public winner() {
       return this.match.winner();
